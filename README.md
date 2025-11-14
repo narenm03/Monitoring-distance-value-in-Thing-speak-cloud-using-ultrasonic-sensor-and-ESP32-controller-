@@ -1,5 +1,6 @@
-# Monitoring-distance-value-in-Thing-speak-cloud-using-ultrasonic-sensor-and-ESP32-controller
-
+# Monitoring distanceva VAlue in Thing speak cloud using ultrasonic sensor and ESP32 controller
+## NAME: NARENDHARAN.M
+## REG NO: 212223230134
 # Uploading ultrasonic sensor data in Thing Speak cloud
 
 # AIM:
@@ -96,8 +97,47 @@ Prototype and build IoT systems without setting up servers or developing web sof
 
  
 # PROGRAM:
+```
+  if (inChar == '\n' || inChar == '\r') {
+  stringComplete = true;
+  rxbuff[rxbuff_index]='\0';
+   if(strncmp(rxbuff,"JOINED",6)==0){
+    network_joined_status=1;
+  }
+  if(strncmp(rxbuff,"Dragino LA66 Device",19)==0){
+    network_joined_status=0;
+  }
+  if(strncmp(rxbuff,"Run AT+RECVB=? to see detail",28)==0){
+    time_to_at_recvb=true;
+    stringComplete=false;
+    inputString = "\0";
+  }
+  if(strncmp(rxbuff,"AT+RECVB=",9)==0){       
+    stringComplete=false;
+    inputString = "\0";
+    Serial.print("\r\nGet downlink data(FPort & Payload) ");
+    Serial.println(&rxbuff[9]);
+  }
+   rxbuff_index=0;
+  if(get_LA66_data_status==true){
+    stringComplete=false;
+    inputString = "\0";
+  }
+}
+```
 # CIRCUIT DIAGRAM:
+
+<img width="1600" height="1200" alt="image" src="https://github.com/user-attachments/assets/0ae67a62-5c73-4f4b-a6e4-e8f64f00ceed" />
+
+
+
 # OUTPUT:
+<img width="1918" height="965" alt="image" src="https://github.com/user-attachments/assets/817f357c-d17b-42f0-a7fc-36c3cec81b97" />
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/070c207b-3df5-49d3-9960-ebaf28e3ee68" />
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/e37e292c-7641-4afc-8d36-587d184099d9" />
+
+
+
 # RESULT:
 Thus the distance values are updated in the Thing speak cloud using ESP32 controller.
 
