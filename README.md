@@ -1,6 +1,6 @@
-# Monitoring distanceva VAlue in Thing speak cloud using ultrasonic sensor and ESP32 controller
-## NAME: NARENDHARAN.M
-## REG NO: 212223230134
+# Monitoring distance value in Thing speak cloud using ultrasonic sensor and ESP32 controller
+# NAME  : NARENDHARAN.M
+# REG NO : 212223230134
 # Uploading ultrasonic sensor data in Thing Speak cloud
 
 # AIM:
@@ -97,45 +97,68 @@ Prototype and build IoT systems without setting up servers or developing web sof
 
  
 # PROGRAM:
+
 ```
-  if (inChar == '\n' || inChar == '\r') {
-  stringComplete = true;
-  rxbuff[rxbuff_index]='\0';
-   if(strncmp(rxbuff,"JOINED",6)==0){
-    network_joined_status=1;
-  }
-  if(strncmp(rxbuff,"Dragino LA66 Device",19)==0){
-    network_joined_status=0;
-  }
-  if(strncmp(rxbuff,"Run AT+RECVB=? to see detail",28)==0){
-    time_to_at_recvb=true;
-    stringComplete=false;
-    inputString = "\0";
-  }
-  if(strncmp(rxbuff,"AT+RECVB=",9)==0){       
-    stringComplete=false;
-    inputString = "\0";
-    Serial.print("\r\nGet downlink data(FPort & Payload) ");
-    Serial.println(&rxbuff[9]);
-  }
-   rxbuff_index=0;
-  if(get_LA66_data_status==true){
-    stringComplete=false;
-    inputString = "\0";
-  }
+#include "ThingSpeak.h"
+#include <WiFi.h>
+char ssid[] = "***"; //SSID
+char pass[] = "***"; // Password
+const int trigger = 2;
+const int echo = 26;
+long T;
+float distanceCM;
+WiFiClient  client;
+
+unsigned long myChannelField = 3172564; // Channel ID
+const int ChannelField = 1; // Which channel to write data
+const char * myWriteAPIKey = "93L06EK4W5L3GJBR"; // Your write API Key
+
+void setup()
+{
+  Serial.begin(115200);
+  pinMode(trigger, OUTPUT);
+  pinMode(echo, INPUT);
+  WiFi.mode(WIFI_STA);
+  ThingSpeak.begin(client);
 }
+void loop()
+{
+  if (WiFi.status() != WL_CONNECTED)
+  {
+    Serial.print("Attempting to connect to SSID: ");
+    Serial.println(ssid);
+    while (WiFi.status() != WL_CONNECTED)
+    {
+      WiFi.begin(ssid, pass);
+      Serial.print(".");
+      delay(5000);
+    }
+    Serial.println("\nConnected.");
+  }
+  digitalWrite(trigger, LOW);
+  delay(1);
+  digitalWrite(trigger, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigger, LOW);
+  T = pulseIn(echo, HIGH);
+  distanceCM = T * 0.034;
+  distanceCM = distanceCM / 2;
+  Serial.print("Distance in cm: ");
+  Serial.println(distanceCM);
+  ThingSpeak.writeField(myChannelField, ChannelField, distanceCM, myWriteAPIKey);
+  delay(1000);
+}
+
 ```
 # CIRCUIT DIAGRAM:
 
-<img width="1600" height="1200" alt="image" src="https://github.com/user-attachments/assets/0ae67a62-5c73-4f4b-a6e4-e8f64f00ceed" />
-
+![WhatsApp Image 2025-11-20 at 9 37 49 AM](https://github.com/user-attachments/assets/5a9d7577-9e01-40fb-8e54-e3649cebf351)
 
 
 # OUTPUT:
-<img width="1918" height="965" alt="image" src="https://github.com/user-attachments/assets/817f357c-d17b-42f0-a7fc-36c3cec81b97" />
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/070c207b-3df5-49d3-9960-ebaf28e3ee68" />
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/e37e292c-7641-4afc-8d36-587d184099d9" />
+<img width="1897" height="983" alt="image" src="https://github.com/user-attachments/assets/4ad5f2eb-2095-43d4-88fc-9a0990b0627e" />
 
+<img width="1916" height="972" alt="image" src="https://github.com/user-attachments/assets/57d24651-519f-4e69-8bc7-01edaf6aff96" />
 
 
 # RESULT:
